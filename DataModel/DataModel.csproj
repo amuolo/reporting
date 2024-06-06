@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Enterprise.Reporting.Utils\Enterprise.Reporting.Utils.csproj" />
+  </ItemGroup>
+
 </Project>

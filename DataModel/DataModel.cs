@@ -1,14 +1,14 @@
-﻿namespace DataModel;
+﻿using Enterprise.Reporting.Utils;
 
-public abstract record Dimension
-{
-    public string SystemName { get; } = string.Empty;
-    public string DisplayName { get; } = string.Empty;
-}
+namespace DataModel;
 
-public record LineOfBusiness : Dimension;
+public record LineOfBusiness : HierarchicalDimension;
 
-public record AmountType : Dimension;
+public record AmountType : HierarchicalDimension;
+
+public record Scenario : Dimension;
+
+public record AocType : Dimension;
 
 public class TransactionalData
 {
@@ -17,6 +17,10 @@ public class TransactionalData
     public string AmountType { get; set; } = string.Empty;
 
     public string Scenario { get; set; } = string.Empty;
+
+    public string AocType { get; set; } = string.Empty;
+
+    public string Currency { get; set; } = string.Empty;
 
     public double Value { get; set; }
 
