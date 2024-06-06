@@ -11,5 +11,13 @@ public abstract record HierarchicalDimension : Dimension
     public string Parent { get; set; } = string.Empty;
 }
 
+public abstract record OrderedDimension : Dimension
+{
+    public int Order { get; set; }
+}
 
+public abstract record OrderedHierarchicalDimension : HierarchicalDimension
+{
+    public int Order { get; set; }
+}
 

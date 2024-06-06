@@ -1,9 +1,6 @@
-﻿using System.IO.Enumeration;
-using System.Security.Claims;
+﻿namespace DataModel;
 
-namespace DataModel;
-
-public static class Templates
+public static class TemplateDimensions
 {
     public static LineOfBusiness[] GetLineOfBusinesses() => [
         new() { SystemName = "M",   DisplayName = "Life and Non-Life",  Parent = "" },
@@ -39,5 +36,24 @@ public static class Templates
         new() { SystemName = "FXUP1.0pct", DisplayName = "Exchange Rate Up 1.0pct" },
         new() { SystemName = "MTUP10pct",  DisplayName = "Mortality Up 10pct" }, 
         new() { SystemName = "LUP10pct",   DisplayName = "Longevity Up 10pct" },
+        ];
+
+    public static AocType[] GetAocTypes() => [
+        new() { SystemName = "BOP",  DisplayName = "Beginning of Period" },
+        new() { SystemName = "MC",   DisplayName = "Model Correction" },
+        new() { SystemName = "PC",   DisplayName = "Portfolio Changes" },
+        new() { SystemName = "CF",   DisplayName = "Cash Flow" },
+        new() { SystemName = "IA",   DisplayName = "Interest Accretion" },
+        new() { SystemName = "AU",   DisplayName = "Assumption Update" },
+        new() { SystemName = "FAU",  DisplayName = "Financial Assumption Update" },
+        new() { SystemName = "YCU",  DisplayName = "Yield Curve Update" },                // Parent = "FAU"
+        new() { SystemName = "CRU",  DisplayName = "Credit Risk Update" },                // Parent = "CRU"
+        new() { SystemName = "EV",   DisplayName = "Experience Variance" },
+        new() { SystemName = "WO",   DisplayName = "Write Off" },
+        new() { SystemName = "CL",   DisplayName = "Combined Liabilities" },
+        new() { SystemName = "EA",   DisplayName = "Experience Adjustment" },
+        new() { SystemName = "AM",   DisplayName = "Amortization" },
+        new() { SystemName = "FX",   DisplayName = "FX Impact" },
+        new() { SystemName = "EOP",  DisplayName = "End Of Period" },
         ];
 }
