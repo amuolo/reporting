@@ -1,5 +1,7 @@
 ﻿@page "/ReportTest"
 @rendermode InteractiveServer
+@using DataModel
+@using Enterprise.Reporting
 
 <PageTitle>Report Test</PageTitle>
 
@@ -22,7 +24,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(1000);
-
+       
         Report +=@<table class='table'> 
                     <thead>
                     <tr>
@@ -44,6 +46,9 @@ else
                         }
                     </tbody>
                   </table>;
+                  
+
+        Report = Reporting.Create<TransactionalData>([]).GetReport();
 
         init = true;
     }

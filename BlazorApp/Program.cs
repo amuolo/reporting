@@ -1,4 +1,6 @@
 using BlazorApp.Components;
+using DataModel;
+using Enterprise.Reporting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,5 +27,4 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();
-
 
