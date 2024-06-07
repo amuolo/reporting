@@ -1,5 +1,6 @@
 ﻿@page "/ReportTest"
 @rendermode InteractiveServer
+
 @using DataModel
 @using Enterprise.Reporting
 
@@ -7,25 +8,25 @@
 
 <h1>My Table</h1>
 
-@if (!init)
+@if (Report is null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    @Report
+    @Report.GetFragment(this)
 }
 
 
 @code {
-    bool init = false;
-    RenderFragment Report { get; set; }
+    Report<TransactionalData>? Report { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(1000);
-       
-        Report +=@<table class='table'> 
+        
+        /*RenderFragment a = builder => { };
+        a +=@<table class='table'> 
                     <thead>
                     <tr>
                         <th @onclick='UpdateReport'>Date</th>
@@ -45,17 +46,9 @@ else
                             </tr>
                         }
                     </tbody>
-                  </table>;
-                  
+                  </table>;*/
 
-        Report = Reporting.Create<TransactionalData>([]).GetReport();
-
-        init = true;
-    }
-
-    private async Task UpdateReport() 
-    {
-        init = false;
-        InvokeAsync(StateHasChanged);
+        var data = TemplateTransactionalData.GetTransactionalData();
+        Report = Reporting.Create<TransactionalData>(data).InitiateReport(() => InvokeAsync(StateHasChanged));
     }
 }
