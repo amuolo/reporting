@@ -31,17 +31,17 @@ public abstract record Dimension : IDimension
     public string DisplayName { get; set; } = string.Empty;
 }
 
-public abstract record HierarchicalDimension : Dimension, IDimension
+public abstract record HierarchicalDimension : Dimension, IHierarchicalDimension
 {
     public string Parent { get; set; } = string.Empty;
 }
 
-public abstract record OrderedDimension : Dimension, IDimension
+public abstract record OrderedDimension : Dimension, IOrderedDimension
 {
     public int Order { get; set; }
 }
 
-public abstract record OrderedHierarchicalDimension : HierarchicalDimension, IHierarchicalDimension
+public abstract record OrderedHierarchicalDimension : HierarchicalDimension, IOrderedHierarchicalDimension
 {
     public int Order { get; set; }
 }

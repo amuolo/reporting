@@ -6,6 +6,10 @@ public class ExtractingDimensions
 {
     public record MyRecord(string A, string B, double V);
 
+    public record LineOfBusiness : HierarchicalDimension;
+
+    public record Currency : Dimension;
+
     [TestMethod]
     public void ExtractingFromRecord()
     {
@@ -22,5 +26,55 @@ public class ExtractingDimensions
         Assert.AreEqual((double)10, extractor.Get(obj1, "V"));
 
         Assert.AreEqual(null, extractor.Get(obj1, "X"));
+    }
+
+    [TestMethod]
+    public void GetDimensionInfo()
+    {
+        var lineOfBusinesses = new LineOfBusiness[]
+        {
+            new() { SystemName = "A",   DisplayName = "a",   Parent = "" },
+            new() { SystemName = "B",   DisplayName = "b",   Parent = "" },
+            new() { SystemName = "A1",  DisplayName = "a1",  Parent = "A" },
+            new() { SystemName = "A2",  DisplayName = "a2",  Parent = "A" },
+            new() { SystemName = "A11", DisplayName = "a11", Parent = "A1" },
+            new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
+        };
+
+        var (status, items) = DimensionInfo<LineOfBusiness>.ExtractInfo(lineOfBusinesses);
+
+        Assert.IsTrue(status);
+
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Parent?.SystemName);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "B")?.Parent?.SystemName);
+        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent?.SystemName);
+        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A2")?.Parent?.SystemName);
+        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A11")?.Parent?.SystemName);
+        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A12")?.Parent?.SystemName);
+
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A")?.Children?.Select(x => x.SystemName)?.SequenceEqual(["A1", "A2"])?? false);
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "B")?.Children == null); 
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?.Select(x => x.SystemName)?.SequenceEqual(["A11", "A12"])?? false); 
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A2")?.Children == null);
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A11")?.Children == null);
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A12")?.Children == null);
+    }
+
+    [TestMethod]
+    public void GetDimensionInfoWithIssues()
+    {
+        var lineOfBusinesses = new LineOfBusiness[]
+        {
+            new() { SystemName = "A",   DisplayName = "a",   Parent = "X" },
+            new() { SystemName = "B",   DisplayName = "b",   Parent = "" },
+            new() { SystemName = "A1",  DisplayName = "a1",  Parent = "A" },
+            new() { SystemName = "A2",  DisplayName = "a2",  Parent = "A" },
+            new() { SystemName = "A11", DisplayName = "a11", Parent = "A1" },
+            new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
+        };
+
+        var (status, items) = DimensionInfo<LineOfBusiness>.ExtractInfo(lineOfBusinesses);
+
+        Assert.IsFalse(status);
     }
 }
