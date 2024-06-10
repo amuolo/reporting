@@ -8,7 +8,7 @@ public class DimensionInfo<T> where T : IDimension
 
     public T? Parent { get; private set; }
 
-    public static (bool status, DimensionInfo<T>[] info) ExtractInfo (ICollection<T> items)
+    public static (bool status, DimensionInfo<T>[] info) Extract (ICollection<T> items)
     {
         if (typeof(T).IsAssignableTo(typeof(IHierarchicalDimension)))
         {

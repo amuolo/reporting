@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 
 namespace Enterprise.Reporting.Utils.Tests;
 
@@ -43,7 +42,7 @@ public class ExtractingDimensions
             new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
         };
 
-        var (status, items) = DimensionInfo<LineOfBusiness>.ExtractInfo(lineOfBusinesses);
+        var (status, items) = DimensionInfo<LineOfBusiness>.Extract(lineOfBusinesses);
 
         Assert.IsTrue(status);
 
@@ -81,7 +80,7 @@ public class ExtractingDimensions
             new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
         };
 
-        var (status, items) = DimensionInfo<LineOfBusiness>.ExtractInfo(lineOfBusinesses);
+        var (status, items) = DimensionInfo<LineOfBusiness>.Extract(lineOfBusinesses);
 
         Assert.IsFalse(status);
     }
