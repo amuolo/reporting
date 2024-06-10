@@ -11,6 +11,10 @@ public class ExtractingDimensions
 
     public record Currency : Dimension;
 
+    public record Nasty : Dimension { public Guid Guid { get; set; } = Guid.NewGuid(); };
+
+    public record HierarchicalNasty : HierarchicalDimension { public Guid Guid { get; set; } = Guid.NewGuid(); };
+
     [TestMethod]
     public void ExtractingFromRecord()
     {
@@ -68,21 +72,21 @@ public class ExtractingDimensions
         Assert.IsTrue(status);
 
         Assert.AreEqual(lineOfBusinesses.FirstOrDefault(x => x.SystemName == "B"), items.FirstOrDefault(x => x.Item.SystemName == "B")?.Item);
-        Assert.AreEqual(lineOfBusinesses.FirstOrDefault(x => x.SystemName == "A"), items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent);
+        Assert.AreEqual(lineOfBusinesses.FirstOrDefault(x => x.SystemName == "A"), items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent?.Item);
 
         Assert.IsTrue(lineOfBusinesses.Where(x => x.Parent == "A1").SequenceEqual(
-            items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?? [])); 
+            items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?.Select(x => x.Item)?? [])); 
 
-        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Parent?.SystemName);
-        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "B")?.Parent?.SystemName);
-        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent?.SystemName);
-        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A2")?.Parent?.SystemName);
-        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A11")?.Parent?.SystemName);
-        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A12")?.Parent?.SystemName);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Parent?.Item.SystemName);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "B")?.Parent?.Item.SystemName);
+        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent?.Item.SystemName);
+        Assert.AreEqual("A", items.FirstOrDefault(x => x.Item.SystemName == "A2")?.Parent?.Item.SystemName);
+        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A11")?.Parent?.Item.SystemName);
+        Assert.AreEqual("A1", items.FirstOrDefault(x => x.Item.SystemName == "A12")?.Parent?.Item.SystemName);
 
-        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A")?.Children?.Select(x => x.SystemName)?.SequenceEqual(["A1", "A2"])?? false);
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A")?.Children?.Select(x => x.Item.SystemName)?.SequenceEqual(["A1", "A2"])?? false);
         Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "B")?.Children == null); 
-        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?.Select(x => x.SystemName)?.SequenceEqual(["A11", "A12"])?? false); 
+        Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?.Select(x => x.Item.SystemName)?.SequenceEqual(["A11", "A12"])?? false); 
         Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A2")?.Children == null);
         Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A11")?.Children == null);
         Assert.IsTrue(items.FirstOrDefault(x => x.Item.SystemName == "A12")?.Children == null);
@@ -104,5 +108,37 @@ public class ExtractingDimensions
         var (status, items) = lineOfBusinesses.ExtractInfo();
 
         Assert.IsFalse(status);
+    }
+
+    [TestMethod]
+    public void MemoryFriendlyWithDimensions()
+    {
+        var nasties = new Nasty[]
+        {
+            new() { SystemName = "A", DisplayName = "a" },
+            new() { SystemName = "B", DisplayName = "b" },
+        };
+
+        var (status, items) = nasties.ExtractInfo();
+
+        Assert.IsTrue(status);
+
+        Assert.AreEqual(nasties[0].Guid, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.Guid);
+    }
+
+    [TestMethod]
+    public void MemoryFriendlyWithHierarchicalDimensions()
+    {
+        var nasties = new HierarchicalNasty[]
+        {
+            new() { SystemName = "A", DisplayName = "a", Parent = "" },
+            new() { SystemName = "A1", DisplayName = "a1", Parent = "A" },
+        };
+
+        var (status, items) = nasties.ExtractInfo();
+
+        Assert.IsTrue(status);
+
+        Assert.AreEqual(nasties[0].Guid, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.Guid);
     }
 }
