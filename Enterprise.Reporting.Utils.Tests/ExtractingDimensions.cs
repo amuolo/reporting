@@ -1,4 +1,6 @@
 ﻿
+using System.Linq;
+
 namespace Enterprise.Reporting.Utils.Tests;
 
 [TestClass]
@@ -44,6 +46,12 @@ public class ExtractingDimensions
         var (status, items) = DimensionInfo<LineOfBusiness>.ExtractInfo(lineOfBusinesses);
 
         Assert.IsTrue(status);
+
+        Assert.AreEqual(lineOfBusinesses.FirstOrDefault(x => x.SystemName == "B"), items.FirstOrDefault(x => x.Item.SystemName == "B")?.Item);
+        Assert.AreEqual(lineOfBusinesses.FirstOrDefault(x => x.SystemName == "A"), items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Parent);
+
+        Assert.IsTrue(lineOfBusinesses.Where(x => x.Parent == "A1").SequenceEqual(
+            items.FirstOrDefault(x => x.Item.SystemName == "A1")?.Children?? [])); 
 
         Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Parent?.SystemName);
         Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "B")?.Parent?.SystemName);
