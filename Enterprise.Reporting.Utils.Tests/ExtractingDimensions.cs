@@ -32,6 +32,27 @@ public class ExtractingDimensions
     [TestMethod]
     public void GetDimensionInfo()
     {
+        var currencies = new Currency[]
+        {
+            new() { SystemName = "CHF", DisplayName = "Swiss Francs" },
+            new() { SystemName = "EUR", DisplayName = "Euro" }
+        };
+
+        var (status, items) = currencies.ExtractInfo();
+
+        Assert.IsTrue(status);
+
+        Assert.AreEqual("Swiss Francs", items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Item?.DisplayName);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Children);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Parent);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Root);
+        Assert.AreEqual(null, items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Leaves);
+        Assert.AreEqual(0, items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Level);
+    }
+
+    [TestMethod]
+    public void GetHierarchicalDimensionInfo()
+    {
         var lineOfBusinesses = new LineOfBusiness[]
         {
             new() { SystemName = "A",   DisplayName = "a",   Parent = "" },
@@ -42,7 +63,7 @@ public class ExtractingDimensions
             new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
         };
 
-        var (status, items) = DimensionInfo<LineOfBusiness>.Extract(lineOfBusinesses);
+        var (status, items) = lineOfBusinesses.ExtractInfo();
 
         Assert.IsTrue(status);
 
@@ -68,7 +89,7 @@ public class ExtractingDimensions
     }
 
     [TestMethod]
-    public void GetDimensionInfoWithIssues()
+    public void GetHierarchicalDimensionInfoWithIssues()
     {
         var lineOfBusinesses = new LineOfBusiness[]
         {
@@ -80,7 +101,7 @@ public class ExtractingDimensions
             new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
         };
 
-        var (status, items) = DimensionInfo<LineOfBusiness>.Extract(lineOfBusinesses);
+        var (status, items) = lineOfBusinesses.ExtractInfo();
 
         Assert.IsFalse(status);
     }
