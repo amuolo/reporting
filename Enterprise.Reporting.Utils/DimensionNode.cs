@@ -25,7 +25,7 @@ public class DimensionNode<T> where T : IDimension
 
 public static class DimensionNode
 {
-    // O(n * num_levels)
+    // O(leaves * num_levels)
     public static (bool status, DimensionNode<TDimension>[] info) ExtractNodes<TDimension> (this ICollection<TDimension> items)
         where TDimension : IDimension
     {
@@ -68,14 +68,13 @@ public static class DimensionNode
 
                 while (true)                                                               // O(num_levels)
                 {
-                    node.Level++;
-
                     if (((IHierarchicalDimension)tmp.Item).Parent is null)
                     {
                         node.Root = tmp;
                         break;
                     }
 
+                    node.Level++;
                     itemsBySystemName.TryGetValue(((IHierarchicalDimension)tmp.Item).Parent!, out var tmpParent);
 
                     if (tmpParent is null)
@@ -90,9 +89,16 @@ public static class DimensionNode
                 }
             }
 
-            foreach (var node in nodes.Where(x => x.Parent is null))                       // O(roots)
+            foreach (var node in nodes.Where(x => x.Children is null))                       // O(leaves)
             {
-
+                var tmp = node;
+                while (((IHierarchicalDimension)tmp.Item).Parent is not null)                // O(num_levels)
+                {
+                    itemsBySystemName.TryGetValue(((IHierarchicalDimension)tmp.Item).Parent!, out var tmpParent);
+                    tmpParent!.Level = tmp.Level - 1;
+                    tmpParent!.Root = tmp.Root;
+                    tmp = tmpParent;
+                }
             }
 
             return (status && items.Count() == nodes.Length, nodes);
