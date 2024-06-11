@@ -1,40 +1,10 @@
-﻿using System.Linq;
-
-namespace Enterprise.Reporting.Utils.Tests;
+﻿namespace Enterprise.Reporting.Utils.Tests;
 
 [TestClass]
-public class ExtractingDimensions
+public class TestingDimensionNodes
 {
-    public record MyRecord(string A, string B, double V);
-
-    public record LineOfBusiness : HierarchicalDimension;
-
-    public record Currency : Dimension;
-
-    public record Nasty : Dimension { public Guid Guid { get; set; } = Guid.NewGuid(); };
-
-    public record HierarchicalNasty : HierarchicalDimension { public Guid Guid { get; set; } = Guid.NewGuid(); };
-
     [TestMethod]
-    public void ExtractingFromRecord()
-    {
-        var obj1 = new MyRecord("xx", "yy", 10);
-        var obj2 = new MyRecord("mm", "nn", 100);
-
-        var extractor = DimensionExtractor<MyRecord>.Instance;
-
-        Assert.AreEqual("xx", extractor.Get(obj1, "A"));
-        Assert.AreEqual("yy", extractor.Get(obj1, "B"));
-        Assert.AreEqual("mm", extractor.Get(obj2, "A"));
-        Assert.AreEqual("nn", extractor.Get(obj2, "B"));
-
-        Assert.AreEqual((double)10, extractor.Get(obj1, "V"));
-
-        Assert.AreEqual(null, extractor.Get(obj1, "X"));
-    }
-
-    [TestMethod]
-    public void GetDimensionInfo()
+    public void DimensionNodes()
     {
         var currencies = new Currency[]
         {
@@ -42,7 +12,7 @@ public class ExtractingDimensions
             new() { SystemName = "EUR", DisplayName = "Euro" }
         };
 
-        var (status, items) = currencies.ExtractInfo();
+        var (status, items) = currencies.ExtractNodes();
 
         Assert.IsTrue(status);
 
@@ -55,19 +25,11 @@ public class ExtractingDimensions
     }
 
     [TestMethod]
-    public void GetHierarchicalDimensionInfo()
+    public void HierarchicalDimensionNodes()
     {
-        var lineOfBusinesses = new LineOfBusiness[]
-        {
-            new() { SystemName = "A",   DisplayName = "a",   Parent = "" },
-            new() { SystemName = "B",   DisplayName = "b",   Parent = "" },
-            new() { SystemName = "A1",  DisplayName = "a1",  Parent = "A" },
-            new() { SystemName = "A2",  DisplayName = "a2",  Parent = "A" },
-            new() { SystemName = "A11", DisplayName = "a11", Parent = "A1" },
-            new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
-        };
+        var lineOfBusinesses = TemplateModel.GetLineOfBusinesses();
 
-        var (status, items) = lineOfBusinesses.ExtractInfo();
+        var (status, items) = lineOfBusinesses.ExtractNodes();
 
         Assert.IsTrue(status);
 
@@ -93,19 +55,43 @@ public class ExtractingDimensions
     }
 
     [TestMethod]
-    public void GetHierarchicalDimensionInfoWithIssues()
+    public void AdvancedHierarchicalNodes()
     {
-        var lineOfBusinesses = new LineOfBusiness[]
-        {
-            new() { SystemName = "A",   DisplayName = "a",   Parent = "X" },
-            new() { SystemName = "B",   DisplayName = "b",   Parent = "" },
-            new() { SystemName = "A1",  DisplayName = "a1",  Parent = "A" },
-            new() { SystemName = "A2",  DisplayName = "a2",  Parent = "A" },
-            new() { SystemName = "A11", DisplayName = "a11", Parent = "A1" },
-            new() { SystemName = "A12", DisplayName = "a12", Parent = "A1" },
-        };
+        var lineOfBusinesses = TemplateModel.GetLineOfBusinesses();
 
-        var (status, items) = lineOfBusinesses.ExtractInfo();
+        var (status, items) = lineOfBusinesses.ExtractNodes();
+
+        Assert.IsTrue(status);
+
+        var nodeA = items.FirstOrDefault(x => x.Item.SystemName == "A");
+
+        Assert.AreEqual(0, nodeA?.Level, "A Level fails");
+        Assert.AreEqual(null, nodeA?.Parent, "A Parent fails");
+        Assert.IsTrue(nodeA?.Children?.Select(x => x.Item.SystemName).SequenceEqual(["A1", "A2"]), "A Children fail");
+        Assert.IsTrue(nodeA?.AllChildren?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A1", "A11", "A12", "A2"]), "A AllChildren fails");
+        Assert.IsTrue(nodeA?.AllAncestors?.Count() == 0, "A AllAncestors fails");
+        Assert.IsTrue(nodeA?.Root?.Item.SystemName == "A", "A Root fails");
+        Assert.IsTrue(nodeA?.Leaves?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12", "A2"]), "A Leaves fails");
+
+        var nodeA1 = items.FirstOrDefault(x => x.Item.SystemName == "A1");
+
+        Assert.AreEqual(1, nodeA1?.Level, "A1 Level fails");
+        Assert.AreEqual("A", nodeA1?.Parent?.Item.SystemName, "A1 Parent fails");
+        Assert.IsTrue(nodeA1?.Children?.Select(x => x.Item.SystemName).SequenceEqual(["A11", "A12"]), "A1 Children fail");
+        Assert.IsTrue(nodeA1?.AllChildren?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12"]), "A1 AllChildren fails");
+        Assert.IsTrue(nodeA1?.AllAncestors?.Count() == 1, "A1 AllAncestors fails");
+        Assert.IsTrue(nodeA1?.AllAncestors.First().Item.SystemName == "A", "A1 AllAncestors fails");
+        Assert.IsTrue(nodeA1?.Root?.Item.SystemName == "A", "A1 Root fails");
+        Assert.IsTrue(nodeA1?.Leaves?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12"]), "A1 Leaves fails");
+    }
+
+    [TestMethod]
+    public void HierarchicalDimensionInfoWithIssues()
+    {
+        var lineOfBusinesses = TemplateModel.GetLineOfBusinesses();
+        lineOfBusinesses[0].Parent = "X";
+
+        var (status, items) = lineOfBusinesses.ExtractNodes();
 
         Assert.IsFalse(status);
     }
@@ -119,7 +105,7 @@ public class ExtractingDimensions
             new() { SystemName = "B", DisplayName = "b" },
         };
 
-        var (status, items) = nasties.ExtractInfo();
+        var (status, items) = nasties.ExtractNodes();
 
         Assert.IsTrue(status);
 
@@ -131,11 +117,11 @@ public class ExtractingDimensions
     {
         var nasties = new HierarchicalNasty[]
         {
-            new() { SystemName = "A", DisplayName = "a", Parent = "" },
+            new() { SystemName = "A", DisplayName = "a", Parent = null },
             new() { SystemName = "A1", DisplayName = "a1", Parent = "A" },
         };
 
-        var (status, items) = nasties.ExtractInfo();
+        var (status, items) = nasties.ExtractNodes();
 
         Assert.IsTrue(status);
 

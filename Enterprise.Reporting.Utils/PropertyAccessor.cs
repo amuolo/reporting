@@ -3,17 +3,17 @@ using System.Reflection;
 
 namespace Enterprise.Reporting.Utils;
 
-public class DimensionExtractor<T>
+public class PropertyAccessor<T>
 {
     private static readonly PropertyInfo[] Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
 
     private static Func<T, string, object> compiledPropertyAccessor;
 
-    public static readonly DimensionExtractor<T> Instance = new DimensionExtractor<T>();
+    public static readonly PropertyAccessor<T> Instance = new PropertyAccessor<T>();
 
     public object Get(T obj, string key) => compiledPropertyAccessor(obj, key);
 
-    private DimensionExtractor()
+    private PropertyAccessor()
     {
         compiledPropertyAccessor = CreatePropertyAccessor();
     }
@@ -30,7 +30,7 @@ public class DimensionExtractor<T>
         ));
 
         var concatenated = Expression.Call(
-            typeof(DimensionExtractor<T>).GetMethod(nameof(Concatenate))!, 
+            typeof(PropertyAccessor<T>).GetMethod(nameof(Concatenate))!, 
             Expression.NewArrayInit(typeof(object), propertyAccessExpressions));
 
         var lambda = Expression.Lambda<Func<T, string, object>>(concatenated, inputObject, propertyName);

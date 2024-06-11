@@ -1,4 +1,6 @@
-﻿namespace Enterprise.Reporting.Utils;
+﻿using System.Runtime;
+
+namespace Enterprise.Reporting.Utils;
 
 public class DimensionNode<T> where T : IDimension
 {
@@ -23,15 +25,15 @@ public class DimensionNode<T> where T : IDimension
 
 public static class DimensionNode
 {
-    // O(n)
-    public static (bool status, DimensionNode<TDimension>[] info) ExtractInfo<TDimension> (this ICollection<TDimension> items)
+    // O(n * num_levels)
+    public static (bool status, DimensionNode<TDimension>[] info) ExtractNodes<TDimension> (this ICollection<TDimension> items)
         where TDimension : IDimension
     {
         if (typeof(TDimension).IsAssignableTo(typeof(IHierarchicalDimension)))
         {
             bool status = true;
             var nodes = items.Select(x => {                                                // O(n)
-                if (x.SystemName is null || ((IHierarchicalDimension)x).Parent is null)
+                if (x.SystemName is null)
                     status = false;
                 return new DimensionNode<TDimension>(x);
             }).ToArray();   
@@ -39,43 +41,57 @@ public static class DimensionNode
             if (!status)
                 return (false, nodes);
 
-            var itemsBySystemName = nodes.ToDictionary(x => x.Item.SystemName);            // O(n)
-            var itemsByParent = nodes.GroupBy(x => ((IHierarchicalDimension)x.Item).Parent).ToDictionary(x => x.Key, x => x.ToArray()); // O(n)
+            var nodesWithParent = nodes.Where(x => ((IHierarchicalDimension)x.Item).Parent != null).ToArray();        // O(n)
 
-            if (nodes.Any(x => ((IHierarchicalDimension)x.Item).Parent != "" && 
-                !itemsBySystemName.ContainsKey(((IHierarchicalDimension)x.Item).Parent)))  // O(n)
-                return (false, nodes);    
+            var itemsBySystemName = nodes.ToDictionary(x => x.Item.SystemName);                                       // O(n)
+            var itemsByParent = nodesWithParent.GroupBy(x => ((IHierarchicalDimension)x.Item).Parent!).ToDictionary(x => x.Key, x => x.ToArray()); // O(n)
 
-            foreach (var node in nodes)                                                    // O(n)
+            if (nodesWithParent.Any(x => !itemsBySystemName.ContainsKey(((IHierarchicalDimension)x.Item).Parent!)))   // O(n)
+                return (false, nodes);
+
+            foreach (var node in nodes)                                                                               // O(n)
             {
-                itemsBySystemName.TryGetValue(((IHierarchicalDimension)node.Item).Parent, out var parent);  // O(1)
-                itemsByParent.TryGetValue(node.Item.SystemName, out var children);                          // O(1)
+                itemsBySystemName.TryGetValue(((IHierarchicalDimension)node.Item).Parent?? Guid.NewGuid().ToString(), out var parent);  // O(1)
+                itemsByParent.TryGetValue(node.Item.SystemName, out var children);                                    // O(1)
 
                 node.Parent = parent;
                 node.Children = children;
-                node.AllAncestors = [];
-                node.AllChildren = [];
-                node.Leaves = [];
+                node.AllAncestors = parent is null ? [] : [parent];
+                node.AllChildren = children;
+                node.Leaves = children is null ? [node] : [];
+                node.Root = parent is null ? node : null;
             }
 
-            foreach (var dimInfo in result.Where(x => x.Parent?.SystemName == string.Empty))   // O(n)
-            {
-                int level;
-                DimensionNode<TDimension> dim = dimInfo;
-                bool searchParent = true;
+            foreach (var node in nodes.Where(x => x.Children is null))                     // O(leaves)
+            { 
+                var tmp = node;
 
-                while(ok)
+                while (true)                                                               // O(num_levels)
                 {
-                    dim.Parent
-                    itemsByParent.TryGetValue(dimInfo.Item.SystemName, out var children);
-                    foreach (var child in children)
-                    {
-                        child.
-                    }
-                }
-                
+                    node.Level++;
 
-                //result.FirstOrDefault(x => x.Item.SystemName == dimInfo.Item.Parent).Leaves = [dimInfo.Item];
+                    if (((IHierarchicalDimension)tmp.Item).Parent is null)
+                    {
+                        node.Root = tmp;
+                        break;
+                    }
+
+                    itemsBySystemName.TryGetValue(((IHierarchicalDimension)tmp.Item).Parent!, out var tmpParent);
+
+                    if (tmpParent is null)
+                        throw new Exception("DimensionNode ExtractDimension unexpected null");
+
+                    tmp.AllAncestors = tmp.AllAncestors?.Concat([tmpParent]).DistinctBy(x => x.Item.SystemName).ToArray();
+
+                    tmpParent.AllChildren = tmpParent.AllChildren?.Concat([tmp]).Concat(tmp.AllChildren?? []).DistinctBy(x => x.Item.SystemName).ToArray();
+                    tmpParent.Leaves = tmpParent.Leaves?.Concat(tmp.Leaves!).DistinctBy(x => x.Item.SystemName).ToArray();
+                    
+                    tmp = tmpParent;
+                }
+            }
+
+            foreach (var node in nodes.Where(x => x.Parent is null))                       // O(roots)
+            {
 
             }
 

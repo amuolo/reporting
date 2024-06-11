@@ -3,7 +3,7 @@
 public static class TemplateDimensions
 {
     public static LineOfBusiness[] GetLineOfBusinesses() => [
-        new() { SystemName = "M",   DisplayName = "Life and Non-Life",  Parent = "" },
+        new() { SystemName = "M",   DisplayName = "Life and Non-Life",  Parent = null },
         new() { SystemName = "LI",  DisplayName = "Life",               Parent = "M" },                       
         new() { SystemName = "NL",  DisplayName = "Non-Life",           Parent = "M" },                    
         new() { SystemName = "LIA", DisplayName = "Liability",          Parent = "NL" },                  
@@ -19,8 +19,8 @@ public static class TemplateDimensions
         ];
 
     public static AmountType[] GetAmountTypes() => [
-        new() { SystemName = "CL",  DisplayName = "Claims",                   Parent = "" },
-        new() { SystemName = "PR",  DisplayName = "Premiums",                 Parent = "" },
+        new() { SystemName = "CL",  DisplayName = "Claims",                   Parent = null },
+        new() { SystemName = "PR",  DisplayName = "Premiums",                 Parent = null },
         new() { SystemName = "CLE", DisplayName = "Claim Expenses",           Parent = "CL" },               
         new() { SystemName = "NIC", DisplayName = "Non-investment component", Parent = "CL" },      
         new() { SystemName = "ICO", DisplayName = "Investment component",     Parent = "CL" },      
