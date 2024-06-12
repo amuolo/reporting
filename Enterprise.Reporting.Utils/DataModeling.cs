@@ -19,7 +19,7 @@ public interface IOrderedDimension : IDimension
     public int Order { get; set; }
 }
 
-public interface IOrderedHierarchicalDimension : IHierarchicalDimension
+public interface IOrderedHierarchicalDimension : IHierarchicalDimension, IDimension
 {
     public int Order { get; set; }
 }
@@ -31,7 +31,7 @@ public abstract record Dimension : IDimension
     public string DisplayName { get; set; } = string.Empty;
 }
 
-public abstract record HierarchicalDimension : Dimension, IHierarchicalDimension
+public abstract record HierarchicalDimension : Dimension, IHierarchicalDimension, IDimension
 {
     public string? Parent { get; set; }
 }

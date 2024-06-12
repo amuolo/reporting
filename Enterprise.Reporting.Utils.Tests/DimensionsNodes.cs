@@ -6,11 +6,7 @@ public class TestingDimensionNodes
     [TestMethod]
     public void DimensionNodes()
     {
-        var currencies = new Currency[]
-        {
-            new() { SystemName = "CHF", DisplayName = "Swiss Francs" },
-            new() { SystemName = "EUR", DisplayName = "Euro" }
-        };
+        var currencies = TemplateModel.GetCurrencies();
 
         var (status, items) = currencies.ExtractNodes();
 
@@ -125,32 +121,24 @@ public class TestingDimensionNodes
     [TestMethod]
     public void MemoryFriendlyWithDimensions()
     {
-        var nasties = new Nasty[]
-        {
-            new() { SystemName = "A", DisplayName = "a" },
-            new() { SystemName = "B", DisplayName = "b" },
-        };
+        var nasties = TemplateModel.GetCurrencies();
 
         var (status, items) = nasties.ExtractNodes();
 
         Assert.IsTrue(status);
 
-        Assert.AreEqual(nasties[0].Guid, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.Guid);
+        Assert.AreEqual(nasties[0].GetHashCode(), items.FirstOrDefault(x => x.Item.SystemName == "CHF")?.Item?.GetHashCode());
     }
 
     [TestMethod]
     public void MemoryFriendlyWithHierarchicalDimensions()
     {
-        var nasties = new HierarchicalNasty[]
-        {
-            new() { SystemName = "A", DisplayName = "a", Parent = null },
-            new() { SystemName = "A1", DisplayName = "a1", Parent = "A" },
-        };
+        var nasties = TemplateModel.GetLineOfBusinesses();
 
         var (status, items) = nasties.ExtractNodes();
 
         Assert.IsTrue(status);
 
-        Assert.AreEqual(nasties[0].Guid, items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.Guid);
+        Assert.AreEqual(nasties[0].GetHashCode(), items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.GetHashCode());
     }
 }
