@@ -6,7 +6,9 @@ public class DimensionsRegister
 
     public static DimensionsRegister Instance => new DimensionsRegister();
 
-    public bool Insert<TDimension>(TDimension[] items) where TDimension : IDimension
+    private DimensionsRegister() { }
+
+    public bool Insert<TDimension>(IEnumerable<TDimension> items) where TDimension : IDimension
     {
         var (status, nodes) = items.ExtractNodes();
         if (status)
