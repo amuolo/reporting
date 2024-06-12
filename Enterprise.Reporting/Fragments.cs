@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace Enterprise.Reporting;
@@ -25,10 +26,7 @@ internal static class ReportFragments
     {
         Func<IComponent, RenderFragment> lambda = (IComponent owner) => (builder) =>
         {
-            builder.OpenElement(0, "style");
-            builder.AddMarkupContent(0, ".dimZoom { transition: transform .2s; width: 1px; height: 1px; margin: 0 auto; }");
-            builder.AddMarkupContent(0, ".dimZoom:hover { -ms-transform: scale(1.1); -webkit-transform: scale(1.1); transform: scale(1.1); }");
-            builder.CloseElement();
+            ApplyStyle(builder);
 
             builder.OpenElement(10, "table");
             builder.AddAttribute(10, "class", "table");
@@ -71,6 +69,13 @@ internal static class ReportFragments
         return lambda;
     }
 
+    internal static void ApplyStyle (RenderTreeBuilder builder)
+    {
+        builder.OpenElement(0, "style");
+        builder.AddMarkupContent(0, ".dimZoom { transition: transform .2s; width: 1px; height: 1px; margin: 0 auto; }");
+        builder.AddMarkupContent(0, ".dimZoom:hover { -ms-transform: scale(1.1); -webkit-transform: scale(1.1); transform: scale(1.1); }");
+        builder.CloseElement();
+    }
 }
 
 

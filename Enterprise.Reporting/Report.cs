@@ -10,4 +10,8 @@ public class Report<TData> where TData : class
     public Func<IComponent, RenderFragment> GetFragment { get; internal set; }
 
     public DimensionsRegister DimensionsRegister { get; private set; } = DimensionsRegister.Instance;
+
+    public List<string> ColumnsSlices { get; internal set; } = [];
+
+    public List<string> RowsSlices { get; internal set; } = [];
 }

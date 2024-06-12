@@ -27,4 +27,26 @@ public static class Reporting
         report.DimensionsRegister.Insert(dimensions);
         return report;
     }
+
+    public static Report<TData> SliceColumnsBy<TData>(
+        this Report<TData> report,
+        params string[] slices)
+        where TData : class
+    {
+        foreach (var slice in slices) 
+            report.ColumnsSlices.Add(slice);
+        report.ColumnsSlices.Distinct();
+        return report;
+    }
+
+    public static Report<TData> SliceRowsBy<TData>(
+        this Report<TData> report,
+        params string[] slices)
+        where TData : class
+    {
+        foreach (var slice in slices)
+            report.RowsSlices.Add(slice);
+        report.RowsSlices.Distinct();
+        return report;
+    }
 }
