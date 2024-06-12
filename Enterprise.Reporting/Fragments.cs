@@ -1,37 +1,22 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System;
 
 namespace Enterprise.Reporting;
 
-public static class Reporting
+internal static class ReportFragments
 {
-    public static Report<TData> Create<TData>(IEnumerable<TData> data) where TData : class
-    {
-        return new Report<TData>() { Data = data.ToList() };
-    }
-
-    public static Report<TData> InitiateReport<TData>(
-        this Report<TData> report,
-        Action update
-        ) where TData : class
-    {
-        report.GetFragment = report.GenerateFragment(update);
-        return report;
-    }
-
-    public static void UpdateReport<TData>(
+    internal static void Update<TData>(
         this Report<TData> report,
         Action update,
         int i = -1,
         int j = -1
         ) where TData : class
     {
-        report.GetFragment = report.GenerateFragment(update, i, j);
+        report.GetFragment = report.Generate(update, i, j);
         update();
     }
 
-    public static Func<IComponent, RenderFragment> GenerateFragment<TData>(
+    internal static Func<IComponent, RenderFragment> Generate<TData>(
         this Report<TData> report,
         Action update,
         int i = -1,
@@ -52,7 +37,7 @@ public static class Reporting
 
             builder.OpenElement(13, "th");
             builder.AddAttribute(10, "class", "dimZoom");
-            builder.AddAttribute(14, "onclick", EventCallback.Factory.Create(owner, () => report.UpdateReport(update, i < 0 ? 4 : ++i, ++i)));
+            builder.AddAttribute(14, "onclick", EventCallback.Factory.Create(owner, () => report.Update(update, i < 0 ? 4 : ++i, ++i)));
             builder.AddEventPreventDefaultAttribute(4, "onclick", true);
             builder.AddMarkupContent(16, "A");
             builder.CloseElement();

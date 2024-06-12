@@ -2,7 +2,7 @@
 
 public class DimensionsRegister
 {
-    public Dictionary<string, Dictionary<string, DimensionNode>> Store { get; private set; } = [];
+    private Dictionary<string, Dictionary<string, DimensionNode>> Store { get; set; } = [];
 
     public static DimensionsRegister Instance => new DimensionsRegister();
 
