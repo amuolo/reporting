@@ -67,9 +67,10 @@ public class TestingDimensionNodes
 
         Assert.AreEqual(0, nodeA?.Level, "A Level fails");
         Assert.AreEqual(null, nodeA?.Parent, "A Parent fails");
-        Assert.IsTrue(nodeA?.Children?.Select(x => x.Item.SystemName).SequenceEqual(["A1", "A2"]), "A Children fail");
-        Assert.IsTrue(nodeA?.AllChildren?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A1", "A11", "A12", "A2"]), "A AllChildren fails");
+        Assert.IsTrue(nodeA?.Children?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A1", "A2"]), "A Children fail");
+        Assert.IsTrue(nodeA?.AllChildren?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A1", "A11", "A12", "A2"]), "A AllChildren fails");
         Assert.IsTrue(nodeA?.AllAncestors?.Count() == 0, "A AllAncestors fails");
+        Assert.IsTrue(nodeA?.Siblings?.Count() == 0, "A Siblings fails");
         Assert.IsTrue(nodeA?.Root?.Item.SystemName == "A", "A Root fails");
         Assert.IsTrue(nodeA?.Leaves?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12", "A2"]), "A Leaves fails");
 
@@ -78,11 +79,12 @@ public class TestingDimensionNodes
         Assert.AreEqual(1, nodeA1?.Level, "A1 Level fails");
         Assert.AreEqual("A", nodeA1?.Parent?.Item.SystemName, "A1 Parent fails");
         Assert.IsTrue(nodeA1?.Children?.Select(x => x.Item.SystemName).SequenceEqual(["A11", "A12"]), "A1 Children fail");
-        Assert.IsTrue(nodeA1?.AllChildren?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12"]), "A1 AllChildren fails");
+        Assert.IsTrue(nodeA1?.AllChildren?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A11", "A12"]), "A1 AllChildren fails");
         Assert.IsTrue(nodeA1?.AllAncestors?.Count() == 1, "A1 AllAncestors fails");
         Assert.IsTrue(nodeA1?.AllAncestors.First().Item.SystemName == "A", "A1 AllAncestors fails");
+        Assert.IsTrue(nodeA1?.Siblings?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A2"]), "A1 Siblings fails");
         Assert.IsTrue(nodeA1?.Root?.Item.SystemName == "A", "A1 Root fails");
-        Assert.IsTrue(nodeA1?.Leaves?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A11", "A12"]), "A1 Leaves fails");
+        Assert.IsTrue(nodeA1?.Leaves?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A11", "A12"]), "A1 Leaves fails");
 
         var nodeA11 = items.FirstOrDefault(x => x.Item.SystemName == "A11");
 
@@ -90,7 +92,8 @@ public class TestingDimensionNodes
         Assert.AreEqual("A1", nodeA11?.Parent?.Item.SystemName, "A11 Parent fails");
         Assert.IsTrue(nodeA11?.Children?.Count() == 0, "A11 Children fail");
         Assert.IsTrue(nodeA11?.AllChildren?.Count() == 0, "A11 AllChildren fails");
-        Assert.IsTrue(nodeA11?.AllAncestors?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A", "A1"]), "A11 AllAncestors fails");
+        Assert.IsTrue(nodeA11?.AllAncestors?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A", "A1"]), "A11 AllAncestors fails");
+        Assert.IsTrue(nodeA11?.Siblings?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A12"]), "A11 Siblings fails");
         Assert.IsTrue(nodeA11?.Root?.Item.SystemName == "A", "A11 Root fails");
         Assert.IsTrue(nodeA11?.Leaves?.Count() == 1, "A11 Leaves fails");
         Assert.IsTrue(nodeA11?.Leaves?.First().Item.SystemName == "A11", "A11 Leaves fails");
@@ -101,7 +104,8 @@ public class TestingDimensionNodes
         Assert.AreEqual("A", nodeA2?.Parent?.Item.SystemName, "A2 Parent fails");
         Assert.IsTrue(nodeA2?.Children?.Count() == 0, "A2 Children fail");
         Assert.IsTrue(nodeA2?.AllChildren?.Count() == 0, "A2 AllChildren fails");
-        Assert.IsTrue(nodeA2?.AllAncestors?.Select(x => x.Item.SystemName).OrderBy(x => x).SequenceEqual(["A"]), "A2 AllAncestors fails");
+        Assert.IsTrue(nodeA2?.AllAncestors?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A"]), "A2 AllAncestors fails");
+        Assert.IsTrue(nodeA2?.Siblings?.Select(x => x.Item.SystemName).Order().SequenceEqual(["A1"]), "A2 Siblings fails");
         Assert.IsTrue(nodeA2?.Root?.Item.SystemName == "A", "A2 Root fails");
         Assert.IsTrue(nodeA2?.Leaves?.Count() == 1, "A2 Leaves fails");
         Assert.IsTrue(nodeA2?.Leaves?.First().Item.SystemName == "A2", "A2 Leaves fails");

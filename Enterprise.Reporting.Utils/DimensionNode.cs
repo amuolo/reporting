@@ -16,6 +16,8 @@ public class DimensionNode<T> where T : IDimension
 
     public HashSet<DimensionNode<T>>? AllChildren { get; internal set; }
 
+    public HashSet<DimensionNode<T>>? Siblings { get; internal set; }
+
     public HashSet<DimensionNode<T>>? Leaves { get; internal set; }
 
     public DimensionNode<T>? Root { get; internal set; }
@@ -25,7 +27,9 @@ public class DimensionNode<T> where T : IDimension
 
 public static class DimensionNode
 {
-    // O(leaves * num_levels^2)
+    /*  This method finds all nodes and caches the hierarchy information. 
+     *  The complexity of this operation is: O(max(leaves * num_levels^2, n * children))
+     */
     public static (bool status, DimensionNode<TDimension>[] info) ExtractNodes<TDimension> (this ICollection<TDimension> items)
         where TDimension : IDimension
     {
@@ -39,7 +43,7 @@ public static class DimensionNode
             var nodesWithParent = nodes.Where(x => ((IHierarchicalDimension)x.Item).Parent != null).ToArray();        // O(n)
             var itemsBySystemName = nodes.ToDictionary(x => x.Item.SystemName);                                       // O(n)
             var itemsByParent = nodesWithParent.GroupBy(x => ((IHierarchicalDimension)x.Item).Parent!)
-                                               .ToDictionary(x => x.Key, x => x.ToArray());                           // O(n)
+                                               .ToDictionary(x => x.Key, x => x.ToHashSet());                         // O(n)
 
             if (nodesWithParent.Any(x => !itemsBySystemName.ContainsKey(((IHierarchicalDimension)x.Item).Parent!)))   // O(n)
                 return (false, nodes);
@@ -49,11 +53,13 @@ public static class DimensionNode
                 var parentSystemName = ((IHierarchicalDimension)node.Item).Parent?? Guid.NewGuid().ToString();
                 itemsBySystemName.TryGetValue(parentSystemName, out var parent);                                      // O(1)
                 itemsByParent.TryGetValue(node.Item.SystemName, out var children);                                    // O(1)
+                itemsByParent.TryGetValue(parentSystemName, out var siblings);                                        // O(1)
 
                 node.Parent = parent;
-                node.Children = children?.ToHashSet()?? [];
+                node.Children = children?? [];
                 node.AllAncestors = parent is null ? [] : [parent];
-                node.AllChildren = children?.ToHashSet()?? [];
+                node.AllChildren = (children?? []).ToHashSet();                                                       // O(children)
+                node.Siblings = (siblings?? []).Except([node]).ToHashSet();                                           // O(siblings)
                 node.Leaves = children is null ? [node] : [];
                 node.Root = parent is null ? node : null;
             }
