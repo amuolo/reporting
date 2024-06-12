@@ -49,6 +49,6 @@ else
                   </table>;*/
 
         var data = TemplateTransactionalData.GetTransactionalData();
-        Report = Reporting.Create<TransactionalData>(data).InitiateReport(() => InvokeAsync(StateHasChanged));
+        Report = Reporting.Create(data).InitiateReport(() => InvokeAsync(StateHasChanged));
     }
 }
