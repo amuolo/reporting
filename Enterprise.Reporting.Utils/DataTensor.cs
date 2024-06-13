@@ -1,9 +1,9 @@
 ﻿
 namespace Enterprise.Reporting.Utils;
 
-public class DataNetwork<TData> where TData : class
+public class DataTensor<TData> where TData : class
 {
-    private DataNetwork(IEnumerable<TData> data)
+    private DataTensor(IEnumerable<TData> data)
     {
         Data = data.ToList();
         Accessor = PropertyAccessor<TData>.Instance;
@@ -15,7 +15,7 @@ public class DataNetwork<TData> where TData : class
 
     public string[] DimensionNames { get; } = PropertyAccessor<TData>.StringPropertyNames;
 
-    public static DataNetwork<TData> Instance<TData>(IEnumerable<TData> data) where TData : class => new DataNetwork<TData>(data);
+    public static DataTensor<TData> Instance<TData>(IEnumerable<TData> data) where TData : class => new DataTensor<TData>(data);
 
     public PropertyAccessor<TData> Accessor { get; internal set; }
 

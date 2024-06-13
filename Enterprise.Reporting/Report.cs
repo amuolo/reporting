@@ -7,13 +7,13 @@ public class Report<TData> where TData : class
 {
     internal Report(IEnumerable<TData> data)
     {
-        DataNetwork = DataNetwork<TData>.Instance(data);
+        DataNetwork = DataTensor<TData>.Instance(data);
         DimensionNames = DataNetwork.DimensionNames;
         ColumnsSlices.EnsureCapacity(DimensionNames.Length);
         RowsSlices.EnsureCapacity(DimensionNames.Length);
     }
 
-    public DataNetwork<TData> DataNetwork { get; internal set; }
+    public DataTensor<TData> DataNetwork { get; internal set; }
 
     public string[] DimensionNames { get; internal set; }
 
