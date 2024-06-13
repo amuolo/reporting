@@ -20,4 +20,16 @@ public class PropertyAccessor
 
         Assert.AreEqual(null, extractor.Get(obj1, "X"));
     }
+
+    [TestMethod]
+    public void ExtractStringProperties()
+    {
+        var obj1 = new MyRecord("xx", "yy", 10);
+        var obj2 = new MyRecord("mm", "nn", 100);
+
+        var extractor = PropertyAccessor<MyRecord>.Instance;
+
+        Assert.AreEqual("xx_yy", extractor.GetStringProperties(obj1));
+        Assert.AreEqual("mm_nn", extractor.GetStringProperties(obj2));
+    }
 }

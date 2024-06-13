@@ -1,6 +1,4 @@
-﻿using System.Runtime;
-
-namespace Enterprise.Reporting.Utils;
+﻿namespace Enterprise.Reporting.Utils;
 
 public class DimensionNode
 {
