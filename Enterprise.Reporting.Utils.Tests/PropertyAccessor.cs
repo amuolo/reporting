@@ -32,4 +32,18 @@ public class PropertyAccessor
         Assert.AreEqual("xx_yy", extractor.GetStringProperties(obj1));
         Assert.AreEqual("mm_nn", extractor.GetStringProperties(obj2));
     }
+
+    [TestMethod]
+    public void GetStringPropertyNames()
+    {
+        var obj1 = new MyRecord("xx", "yy", 10);
+        var obj2 = new MyRecord("mm", "nn", 100);
+
+        var extractor = PropertyAccessor<MyRecord>.Instance;
+
+        string[] propertyNames = ["A", "B"];
+
+        Assert.IsTrue(PropertyAccessor<MyRecord>.StringPropertyNames.Order().SequenceEqual(propertyNames));
+        Assert.IsTrue(PropertyAccessor<MyRecord>.StringPropertyNames.Order().SequenceEqual(propertyNames));
+    }
 }

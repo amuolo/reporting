@@ -15,6 +15,8 @@ public class PropertyAccessor<T>
 
     public static readonly PropertyAccessor<T> Instance = new PropertyAccessor<T>();
 
+    public static string[] StringPropertyNames { get; } = StringProperties.Select(prop => prop.Name).ToArray();
+
     public object Get(T obj, string propertyName) => compiledPropertyAccessor(obj, propertyName);
 
     public string GetStringProperties(T obj) => compiledStringAccessor(obj);
