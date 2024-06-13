@@ -11,39 +11,46 @@ public static class Reporting
         Action update) 
         where TData : class
     {
+        report.DataNetwork.Initialize();
         report.GetFragment = report.Generate(update);
         return report;
     }
 
-    public static Report<TData> IncludeDimension<TData, TDimension>(
+    public static bool IncludeDimension<TData, TDimension>(
         this Report<TData> report,
         IEnumerable<TDimension> dimensions)
         where TData : class
         where TDimension : IDimension
     {
         report.DimensionsRegister.Insert(dimensions);
-        return report;
+        return true;
     }
 
-    public static Report<TData> SliceColumnsBy<TData>(
+    public static bool SliceColumnsBy<TData>(
         this Report<TData> report,
         params string[] slices)
         where TData : class
     {
+        slices = slices.Where(s => report.DimensionNames.Contains(s) && !report.ColumnsSlices.Contains(s) && !report.RowsSlices.Contains(s)).ToArray();
+        if (!slices.Any())
+            return false;
         foreach (var slice in slices) 
             report.ColumnsSlices.Add(slice);
         report.ColumnsSlices.Distinct();
-        return report;
+        return true;
     }
 
-    public static Report<TData> SliceRowsBy<TData>(
+    public static bool SliceRowsBy<TData>(
         this Report<TData> report,
         params string[] slices)
         where TData : class
     {
+        slices = slices.Where(s => report.DimensionNames.Contains(s) && !report.ColumnsSlices.Contains(s) && !report.RowsSlices.Contains(s)).ToArray();
+        if (!slices.Any())
+            return false;
         foreach (var slice in slices)
             report.RowsSlices.Add(slice);
         report.RowsSlices.Distinct();
-        return report;
+        return true;
     }
 }
