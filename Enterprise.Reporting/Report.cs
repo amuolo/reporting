@@ -8,12 +8,9 @@ public class Report<TData> where TData : class
     internal Report(IEnumerable<TData> data)
     {
         DataNetwork = DataNetwork<TData>.Instance(data);
-        Accessor = PropertyAccessor<TData>.Instance;
     }
 
     internal DataNetwork<TData> DataNetwork { get; set; }
-
-    public PropertyAccessor<TData> Accessor { get; internal set; }
 
     public Func<IComponent, RenderFragment> GetFragment { get; internal set; }
 
