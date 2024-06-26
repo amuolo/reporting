@@ -10,11 +10,11 @@ public class TestsAPI
         var data = TemplateData.GetTransactionalData();
         var report = Reporting.Create(data);
 
-        Assert.IsFalse(report.DataNetwork.Initialized);
+        Assert.IsFalse(report.DataTensor.Initialized);
         
         report.InitiateReport(() => { });
 
-        Assert.IsTrue(report.DataNetwork.Initialized);
+        Assert.IsTrue(report.DataTensor.Initialized);
     }
 
     [TestMethod]

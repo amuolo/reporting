@@ -11,7 +11,7 @@ public static class Reporting
         Action update) 
         where TData : class
     {
-        report.DataNetwork.Initialize();
+        report.DataTensor.Initialize();
         report.GetFragment = report.Generate(update);
         return report;
     }
