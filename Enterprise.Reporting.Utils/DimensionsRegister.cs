@@ -4,9 +4,11 @@ public class DimensionsRegister
 {
     private Dictionary<string, Dictionary<string, DimensionNode>> Store { get; set; } = [];
 
+    private DimensionsRegister() { }
+
     public static DimensionsRegister Instance => new DimensionsRegister();
 
-    private DimensionsRegister() { }
+    public int Size() => Store.Count;
 
     public bool Insert<TDimension>(IEnumerable<TDimension> items) where TDimension : IDimension
     {

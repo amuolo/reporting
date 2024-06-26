@@ -1,5 +1,4 @@
-﻿
-namespace Enterprise.Reporting.Utils;
+﻿namespace Enterprise.Reporting.Utils;
 
 public class DataTensor<TData> where TData : class
 {
@@ -21,12 +20,26 @@ public class DataTensor<TData> where TData : class
 
     public DimensionsRegister DimensionsRegister { get; private set; } = DimensionsRegister.Instance;
 
+    public bool IncludeDimension<TDimension>(IEnumerable<TDimension> dimensions) where TDimension : IDimension
+    {
+        DimensionsRegister.Insert(dimensions);
+        return true;
+    }
+
     public void Initialize()
     {
-        if(Initialized) return;
+        if (Initialized) return;
+
+        if (DimensionsRegister.Size() == 0)
+            InitializeDimensionsRegister();
         
         // evaluate aggregates of aggregates
 
         Initialized = true;
+    }
+
+    private void InitializeDimensionsRegister()
+    {
+        // TODO
     }
 }

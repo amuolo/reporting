@@ -22,8 +22,7 @@ public static class Reporting
         where TData : class
         where TDimension : IDimension
     {
-        report.DimensionsRegister.Insert(dimensions);
-        return true;
+        return report.DataTensor.IncludeDimension(dimensions);
     }
 
     public static bool SliceColumnsBy<TData>(
