@@ -57,6 +57,14 @@ public class DataTensor<TData> where TData : class
         {
             // O(size(data)*size(num_dimensions))
             Data = RawData.Select(x => new IndexedData { Data = x, Nodes = DimensionNames.ToDictionary(dim => dim, dim => GetNode(x, dim)) }).ToList();
+        
+            foreach (var dimensions in Permutations.GetPermutations(DimensionNames, DimensionNames.Length))
+            {
+                foreach (var dimension in dimensions)
+                {
+
+                }
+            }
         }
         catch (Exception ex)
         {
