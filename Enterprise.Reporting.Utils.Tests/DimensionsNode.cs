@@ -141,4 +141,18 @@ public class TestingDimensionNodes
 
         Assert.AreEqual(nasties[0].GetHashCode(), items.FirstOrDefault(x => x.Item.SystemName == "A")?.Item?.GetHashCode());
     }
+
+    [TestMethod]
+    public void SimpleDimensionsToNodes()
+    {
+        var dims = new string[] { "LI", "NL" };
+
+        var (status, items) = dims.ExtractNodes();
+
+        Assert.IsTrue(status);
+
+        Assert.AreEqual("LI", items.FirstOrDefault(x => x.Item.SystemName == "LI")?.Item?.DisplayName);
+
+        Assert.AreEqual("NL", items.FirstOrDefault(x => x.Item.SystemName == "NL")?.Item?.DisplayName);
+    }
 }

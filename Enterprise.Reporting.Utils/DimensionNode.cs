@@ -28,7 +28,7 @@ public static class DimensionNodeUtils
     /*  This method finds all nodes and caches the hierarchy information. 
      *  The complexity of this operation is: O(max(leaves * num_levels^2, n * children))
      */
-    public static (bool status, DimensionNode[] info) ExtractNodes<TDimension> (this IEnumerable<TDimension> input)
+    public static (bool status, DimensionNode[] info) ExtractNodes<TDimension>(this IEnumerable<TDimension> input)
         where TDimension : IDimension
     {
         if (input is null || !input.Any())
@@ -38,7 +38,7 @@ public static class DimensionNodeUtils
         if (!(input is TDimension[] || input is List<TDimension>))
             items = input.ToArray();
 
-        var nodes = items.Select(x => new DimensionNode(x)).ToArray();                                // O(n)
+        var nodes = items.Select(x => new DimensionNode(x)).ToArray();                                            // O(n)
 
         if (!typeof(TDimension).IsAssignableTo(typeof(IHierarchicalDimension)))
             return (true, items.Select(x => new DimensionNode(x)).ToArray());
@@ -101,5 +101,19 @@ public static class DimensionNodeUtils
         }
 
         return (true && items.Count() == nodes.Length, nodes);
+    }
+
+    public static (bool status, DimensionNode[] info) ExtractNodes(this IEnumerable<string> input)
+    {
+        return input.Select(x => new SimpleDimension(x)).ExtractNodes();
+    }
+}
+
+public record SimpleDimension : Dimension
+{
+    public SimpleDimension(string x)
+    {
+        SystemName = x;
+        DisplayName = x;
     }
 }

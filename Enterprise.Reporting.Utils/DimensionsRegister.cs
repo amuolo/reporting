@@ -16,7 +16,15 @@ public class DimensionsRegister
         if (status)
             Store[typeof(TDimension).Name] = nodes.ToDictionary(x => x.Item.SystemName);
         return status;
-    }    
+    }
+
+    public bool Insert(string dimension, IEnumerable<string> names)
+    {
+        var (status, nodes) = names.ExtractNodes();
+        if (status)
+            Store[dimension] = nodes.ToDictionary(x => x.Item.SystemName);
+        return status;
+    }
 
     public bool TryGet<TDimension>(string systemName, out DimensionNode? node) where TDimension : IDimension
     {
